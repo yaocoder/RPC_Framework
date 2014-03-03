@@ -8,4 +8,6 @@ RFC_Framework
 
 2. 客户端实现了与服务端的短连接请求，长连接请求，服务端的推送消息；
 
-3. 服务端采用master-worker（one loop per thread）的高性能模型，可以有效地利用服务器的多核来负载连接处理；
+3. 客户端提供跨平台的支持，目前已经经过windows，linux，android，ios的测试；
+
+4. 服务端采用master-worker（one loop per thread）的高性能模型，可以有效地利用服务器的多核来负载连接处理；
