@@ -19,6 +19,7 @@ CClientNetInterfaceImpl::CClientNetInterfaceImpl()
 	liveStatusCb_	= NULL;
 	pInterLayer_	= new CNetInterLayer;
 	pNetDataOpt_	= new CNetDataLayer;
+	b_callback_register_ = false;
 }
 
 CClientNetInterfaceImpl::~CClientNetInterfaceImpl()
@@ -142,6 +143,7 @@ void CClientNetInterfaceImpl::StopHeartBeat()
 
 void CClientNetInterfaceImpl::RegisterServerPushFunc( ServerPushCallBack_Info sp_cb_info)
 {
+	b_callback_register_ = true;
 	sp_cb_info_ = sp_cb_info;
 }
 
@@ -150,8 +152,11 @@ void CClientNetInterfaceImpl::ServerPushMessageOpt( const std::string& server_pu
 
 	LOG4CXX_TRACE(g_logger, "CUserInterfaceImpl::ServerPushMessageOpt : " << server_push_message);
 
-	//int message_type = 0;
+	if(!b_callback_register_)
+				return;
+
 	SERVER_PUSH_INFO serverPushInfo;
+	serverPushInfo.message = server_push_message;
 
 	if (server_push_message.compare(std::string(STR_PTCP_HAS_ERROR)) == 0)
 	{

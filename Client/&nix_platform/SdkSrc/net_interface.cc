@@ -5,11 +5,8 @@ INetChannelInterface*  INetChannelInterface::instance_ = NULL;
 
 INetChannelInterface* INetChannelInterface::GetImplInstance()
 {
-	if(instance_ == NULL)
-	{
-		instance_ = new CClientNetInterfaceImpl;
-	}
 
+	instance_ = new CClientNetInterfaceImpl;
 	return instance_;
 }
 

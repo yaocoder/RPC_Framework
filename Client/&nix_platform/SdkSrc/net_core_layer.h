@@ -61,8 +61,8 @@ private:
 	bool GetIpByDomain(const std::string& domain, std::string& ip);
 	bool SetTCP_NODELAY(evutil_socket_t sfd);
 
-	static bool persist_connection_has_;
-	static bool persist_connection_libevent_;
+	bool persist_connection_has_;
+	bool persist_connection_libevent_;
 
 	evutil_socket_t persist_sfd_;
 	IN_DATA inData_persist_conn_;

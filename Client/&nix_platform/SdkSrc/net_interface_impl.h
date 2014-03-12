@@ -60,7 +60,7 @@ private:
 
 	ServerPushCallBack_Info sp_cb_info_;
 
-
+	bool b_callback_register_;
 };
 
 

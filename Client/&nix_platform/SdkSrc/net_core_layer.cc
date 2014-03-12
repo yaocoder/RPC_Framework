@@ -14,9 +14,6 @@
 #include "utils.h"
 #include "message.h"
 
-bool CNetCoreLayer::persist_connection_has_ = false;
-bool CNetCoreLayer::persist_connection_libevent_= false;
-
 CNetCoreLayer::CNetCoreLayer(void)
 {
 	local_read_event_ = NULL;
@@ -26,6 +23,8 @@ CNetCoreLayer::CNetCoreLayer(void)
 	persist_sfd_ = 0;
 	error_code_  = 0;
 	port_ = 0;
+	persist_connection_has_ = false;
+	persist_connection_libevent_= false;
 }
 
 CNetCoreLayer::~CNetCoreLayer(void)
@@ -103,7 +102,7 @@ void CNetCoreLayer::DoLocalRead(evutil_socket_t local_tcp_server, short event, v
 		pThis->ShortConnectionOpt(requestInfo);
 	}
 
-	if (!persist_connection_libevent_)
+	if (!pThis->persist_connection_libevent_)
 	{
 		if (PERSIST_CONNECTION == requestInfo.tcp_connect_type)
 		{
@@ -427,12 +426,12 @@ void CNetCoreLayer::DoRemotePersistTcpError(struct bufferevent *bev, short event
 
 int CNetCoreLayer::ClosePersistConnection()
 {
-	int ret = evutil_closesocket(persist_sfd_);
+	int ret = shutdown(persist_sfd_, SHUT_RDWR);
+	LOG4CXX_TRACE(g_logger, "*********************ClosePersistConnection:persist_sfd_ = " << persist_sfd_ << "*********************");
 	if (ret != 0)
 	{
 		LOG4CXX_ERROR(g_logger, " CNetCoreLayer::ClosePersistConnection error = " << evutil_socket_error_to_string(EVUTIL_SOCKET_ERROR()));
 	}
-	persist_connection_has_ = false;
 	return ret;
 }
 

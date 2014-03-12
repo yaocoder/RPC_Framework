@@ -36,12 +36,20 @@ bool CNetInterLayer::Init(CClientNetInterfaceImpl* pUserInterfaceImpl, const std
 
 	/** 开启libevent处理线程 */
 	pthread_t threadId;
-	int hThrd = pthread_create(&threadId,  NULL , ThreadFunc , this);
-	if (0 != hThrd)
-	{
-		LOG4CXX_ERROR(g_logger, " CNetInterLayer::Init:Thread:netCore:Run() failed.");
+	int hThrd = pthread_create(&threadId, NULL, ThreadFunc, this);
+	if (0 != hThrd) {
+		LOG4CXX_ERROR(g_logger, " CNetInterLayer::Init:ThreadFunc failed.");
 		return false;
 	}
+
+	/** 开启推送消息回调函数处理线程 */
+	hThrd = pthread_create(&threadId, NULL, ThreadPushFunc, this);
+	if (0 != hThrd)
+	{
+		LOG4CXX_ERROR(g_logger, " CNetInterLayer::Init:ThreadPushFunc failed.");
+		return false;
+	}
+
 	LOG4CXX_INFO(g_logger, " CNetInterLayer::Init:Thread:netCore:Run() success.");
 
 	return true;
@@ -66,34 +74,49 @@ int CNetInterLayer::GetMessageId()
 	return message_id_ = message_id_ + 1;
 }
 
+void* CNetInterLayer::ThreadPushFunc(void* param)
+{
+	CNetInterLayer* pThis = static_cast<CNetInterLayer*>(param);
+	pThis->CallServerPushMessageOpt();
+	return NULL;
+}
+
+void  CNetInterLayer::CallServerPushMessageOpt()
+{
+	boost::mutex::scoped_lock oLock(mutex_push_);
+	std::string push_message;
+	while(b_push_thread_run_)
+	{
+		cond_push_.wait(mutex_push_);
+		while(!list_push_message_.empty())
+		{
+			list_push_message_.pop_front(push_message);
+			pUserInterfaceImpl_->ServerPushMessageOpt(push_message);
+		}
+	}
+
+	return;
+}
+
 void CNetInterLayer::ReciveData(const std::string& response, const int connection_type)
 {
 
 	/* 恢复转义处理*/
 	std::string recover_string = utils::ReplaceString(response, "\\\\r\\\\n", "\\r\\n");
 
-	/* 判断是否为推送消息 */
+	int message_id = 0;
+	/** 判断是否为推送消息,没有异步过程标识(message_id)的为推送消息 */
 	if (PERSIST_CONNECTION == connection_type)
 	{
-
-		/** 连接断开 **/
-		if (recover_string.compare(std::string(STR_PTCP_HAS_CLOSED)) == 0)
+		if (!pNetDataOpt_->JsonParseMessageId(recover_string, message_id))
 		{
-			pUserInterfaceImpl_->ServerPushMessageOpt(recover_string);
+			list_push_message_.push_back(recover_string);
+			cond_push_.notify_one();
 			return;
 		}
-		/** 连接错误 **/
-		if (recover_string.compare(std::string(STR_PTCP_HAS_ERROR)) == 0)
-		{
-			pUserInterfaceImpl_->ServerPushMessageOpt(recover_string);
-			return;
-		}
-
-		//TODO:推送消息处理
 	}
 
 	/* 解析消息ID */
-	int message_id = 0;
 	if (!pNetDataOpt_->JsonParseMessageId(recover_string, message_id))
 	{
 		LOG4CXX_WARN(g_logger, "CNetInterLayer::ReciveData invalid, message = " << recover_string);

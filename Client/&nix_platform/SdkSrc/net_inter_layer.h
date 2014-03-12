@@ -38,6 +38,14 @@ private:
 	void		ClearMapByMessageId(const int message_id);
 	void		maketimeout(struct timespec *tsp, long milliseconds);
 
+
+	static void* ThreadPushFunc(void* param);
+	void CallServerPushMessageOpt();
+	bool b_push_thread_run_;
+	boost::mutex mutex_push_;
+	boost::condition_variable_any cond_push_;
+	CThreadSafeList<std::string> list_push_message_;
+
 private:
 
 	boost::mutex mutex_;
