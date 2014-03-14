@@ -483,7 +483,6 @@ int CNetCoreLayer::connect_nonb( int sockfd, struct sockaddr* saptr, socklen_t s
 		LOG4CXX_FATAL(g_logger, "CNetCoreLayer::connect_nonb:select error: sockfd not set");
 
 done:
-	fcntl(sockfd, F_SETFL, flags | O_NONBLOCK);
 	if (error)
 	{
 		close(sockfd);
