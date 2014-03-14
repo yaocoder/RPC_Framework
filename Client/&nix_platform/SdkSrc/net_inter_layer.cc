@@ -218,8 +218,6 @@ int CNetInterLayer::GetResponseByRequest(const int message_id, const int tcp_con
 	struct timespec timestruct = {0, 0};
 	maketimeout(&timestruct, request_reponse_timeout_);
 	int dw = sem_timedwait(&cond, &timestruct);
-	if(dw != 0) dw = errno;
-	sem_destroy(&cond);
 	switch(dw)
 	{
 	case 0:
@@ -236,9 +234,10 @@ int CNetInterLayer::GetResponseByRequest(const int message_id, const int tcp_con
 		break;
 	default:
 		LOG4CXX_ERROR(g_logger, "CNetInterLayer::GetResponseByRequest error. errorcode = " << strerror(errno) << ", message_id = " << message_id);
-		ret  = REQ_RES_OTHER_ERROR;
+		ret  = errno;
 		break;
 	}
+	sem_destroy(&cond);
 	ClearMapByMessageId(message_id);
 	return ret;
 }

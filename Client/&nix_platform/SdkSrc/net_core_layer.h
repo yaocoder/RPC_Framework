@@ -60,6 +60,7 @@ private:
 	int connect_nonb(int sockfd, struct sockaddr* saptr, socklen_t salen, int nsec);
 	bool GetIpByDomain(const std::string& domain, std::string& ip);
 	bool SetTCP_NODELAY(evutil_socket_t sfd);
+	bool WriteSfd(const int sfd, const char* buf, const int buf_len);
 
 	bool persist_connection_has_;
 	bool persist_connection_libevent_;

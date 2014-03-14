@@ -153,10 +153,9 @@ void CNetCoreLayer::ShortConnectionOpt(const REQUEST_INFO& requestInfo)
 	/** 向服务端发送数据 (对特殊字符进行转义处理\r\n) */
 	std::string request_append = utils::ReplaceString(requestInfo.message, "\\r\\n", "\\\\r\\\\n");
 	request_append = request_append + std::string(CRLF);
-	int send_size = send(requestInfo.sfd, request_append.c_str(), request_append.length(), 0);
-	if (send_size < 0)
-	{
-		LOG4CXX_ERROR(g_logger, "CNetCoreLayer::AddShortConnectionResquest:send failed. error = " << evutil_socket_error_to_string(EVUTIL_SOCKET_ERROR()));
+	bool b_ret = WriteSfd(requestInfo.sfd, request_append.c_str(), request_append.length());
+	if (!b_ret) {
+		LOG4CXX_ERROR(g_logger, "CNetCoreLayer::ShortConnectionOpt:WriteSfd failed. error = " << evutil_socket_error_to_string(EVUTIL_SOCKET_ERROR()));
 		close(requestInfo.sfd);
 		return;
 	}
@@ -307,11 +306,11 @@ int CNetCoreLayer::AddPersistConnectionRequest(const std::string& request)
 
 	std::string request_append = utils::ReplaceString(request_add_token, "\\r\\n", "\\\\r\\\\n");
 	request_append = request_append + std::string(CRLF);
-	int send_size = send(persist_sfd_, request_append.c_str(), request_append.length(), 0);
-	if (send_size < 0)
+	bool b_ret = WriteSfd(persist_sfd_, request_append.c_str(), request_append.length());
+	if (!b_ret)
 	{
 		LOG4CXX_WARN(g_logger,
-				"CNetCoreLayer::AddPersistConnectioRequest:send failed. error = " << evutil_socket_error_to_string(EVUTIL_SOCKET_ERROR()));
+				"CNetCoreLayer::AddPersistConnectioRequest:WriteSfd failed. error = " << evutil_socket_error_to_string(EVUTIL_SOCKET_ERROR()));
 		return CONN_OTHER_ERROR;
 	}
 
@@ -507,6 +506,35 @@ bool CNetCoreLayer::SetTCP_NODELAY(evutil_socket_t sfd)
 		return false;
 	}
 
+	return true;
+}
+
+bool CNetCoreLayer::WriteSfd(const int sfd, const char* buf, const int buf_len) {
+	int write_len = 0;
+	while (write_len != buf_len)
+	{
+		int len = 0;
+		len = write(sfd, buf + write_len, buf_len - write_len);
+		if (len < 0)
+		{
+			if (errno == EINTR)
+			{
+				continue;
+				LOG4CXX_WARN(g_logger, "[SeanSend]error errno==EINTR continue.");
+			}
+			else if (errno == EAGAIN) /* EAGAIN : Resource temporarily unavailable*/
+			{
+				sleep(0.1);
+				continue;
+				LOG4CXX_WARN(g_logger, "[SeanSend]error errno==EAGAIN continue.");
+			}
+			else
+			{
+				return false;
+			}
+		}
+		write_len = write_len + len;
+	}
 	return true;
 }
 
