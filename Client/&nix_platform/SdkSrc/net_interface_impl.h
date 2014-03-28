@@ -24,10 +24,10 @@ public:
 	#endif
 #endif
 
-	int EstablishPersistentChannel(LiveStatusCB liveStatusCb);
+	int EstablishPersistentChannel();
 
-	void RegisterServerPushFunc(ServerPushCallBack_Info sp_cb_info);
-	void ServerPushMessageOpt(const std::string& server_push_message);
+	void RegisterPushFunc(IPushMessageOpt* pPushMessageOpt);
+	void PushMessageOpt(const std::string& push_message);
 
 	int GetResponseByRequestPersistentConnection(const std::string& request, std::string& response);
 
@@ -40,7 +40,7 @@ private:
 	* @param [in] 心跳状态回调函数
 	* @return
 	*/
-	int HeartBeatDetect(LiveStatusCB liveStatusCb);
+	int HeartBeatDetect();
 	/**
 	* @brief 获取与服务器的连接状态是否正常
 	* @return
@@ -58,7 +58,7 @@ private:
 	CNetDataLayer*	pNetDataOpt_;
 	CNetInterLayer* pInterLayer_;
 
-	ServerPushCallBack_Info sp_cb_info_;
+	IPushMessageOpt* pPushMessageOpt_;
 
 	bool b_callback_register_;
 };

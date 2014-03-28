@@ -27,12 +27,11 @@ extern LoggerPtr g_logger;
 
 #endif
 
-typedef struct ServerPushInfo
+typedef struct PushInfo
 {
 	std::string message;
-}SERVER_PUSH_INFO;
+}PUSH_INFO;
 
-typedef void (*ServerPushCallBack_Info)(const int message_type, const SERVER_PUSH_INFO& serverPushInfo);
 
 #define STR_PTCP_HAS_CLOSED "TCP_CLOSED"
 #define STR_PTCP_HAS_ERROR	"TCP_ERROR"

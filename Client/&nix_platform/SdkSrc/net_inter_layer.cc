@@ -12,11 +12,15 @@ CNetInterLayer::CNetInterLayer(void)
 	pUserInterfaceImpl_ = NULL;
 	pNetCore_ = new CNetCoreLayer;
 	pNetDataOpt_ = new CNetDataLayer;
+	b_push_thread_run_ = true;
 }
 
 CNetInterLayer::~CNetInterLayer(void)
 {
+	b_push_thread_run_ = false;
+	cond_push_.notify_one();
 	utils::SafeDelete(pNetCore_);
+	utils::SafeDelete(pNetDataOpt_);
 }
 
 bool CNetInterLayer::Init(CClientNetInterfaceImpl* pUserInterfaceImpl, const std::string& ip, const int port)
@@ -91,7 +95,7 @@ void  CNetInterLayer::CallServerPushMessageOpt()
 		while(!list_push_message_.empty())
 		{
 			list_push_message_.pop_front(push_message);
-			pUserInterfaceImpl_->ServerPushMessageOpt(push_message);
+			pUserInterfaceImpl_->PushMessageOpt(push_message);
 		}
 	}
 
@@ -218,8 +222,6 @@ int CNetInterLayer::GetResponseByRequest(const int message_id, const int tcp_con
 	struct timespec timestruct = {0, 0};
 	maketimeout(&timestruct, request_reponse_timeout_);
 	int dw = sem_timedwait(&cond, &timestruct);
-	if(dw != 0) dw = errno;
-	sem_destroy(&cond);
 	switch(dw)
 	{
 	case 0:
@@ -236,9 +238,10 @@ int CNetInterLayer::GetResponseByRequest(const int message_id, const int tcp_con
 		break;
 	default:
 		LOG4CXX_ERROR(g_logger, "CNetInterLayer::GetResponseByRequest error. errorcode = " << strerror(errno) << ", message_id = " << message_id);
-		ret  = REQ_RES_OTHER_ERROR;
+		ret  = errno;
 		break;
 	}
+	sem_destroy(&cond);
 	ClearMapByMessageId(message_id);
 	return ret;
 }

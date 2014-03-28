@@ -15,7 +15,7 @@ LoggerPtr g_logger;
 CClientNetInterfaceImpl::CClientNetInterfaceImpl()
 {
 	implTimer_ 	 	= NULL;
-	sp_cb_info_	 	= NULL;
+	pPushMessageOpt_	 = NULL;
 	liveStatusCb_	= NULL;
 	pInterLayer_	= new CNetInterLayer;
 	pNetDataOpt_	= new CNetDataLayer;
@@ -69,14 +69,14 @@ bool CClientNetInterfaceImpl::Init(const std::string& ip,const int port)
 #endif
 
 /** ========================================================================= 上线服务=========================================================================**/
-int CClientNetInterfaceImpl::EstablishPersistentChannel(LiveStatusCB liveStatusCb)
+int CClientNetInterfaceImpl::EstablishPersistentChannel()
 {
 	int ret = GetLiveStatus();
 	if(SUCCESS != ret)
 		return ret;
 
 	/** 开启心跳 */
-	ret = HeartBeatDetect(liveStatusCb);
+	ret = HeartBeatDetect();
 	if (SUCCESS != ret)
 	{
 		return OTHER_ERROR;
@@ -86,10 +86,8 @@ int CClientNetInterfaceImpl::EstablishPersistentChannel(LiveStatusCB liveStatusC
 }
 
 
-int CClientNetInterfaceImpl::HeartBeatDetect(LiveStatusCB liveStatusCb)
+int CClientNetInterfaceImpl::HeartBeatDetect()
 {
-	liveStatusCb_ = liveStatusCb;
-
 	long time_interval = 10;
 	implTimer_ = new CImplTimer;
 	implTimer_->HeartBeatImpl(OnTimeGetLiveStatus, (void*)this, time_interval);
@@ -101,7 +99,7 @@ void CClientNetInterfaceImpl::OnTimeGetLiveStatus(void* param)
 {
 	CClientNetInterfaceImpl *pThis = static_cast<CClientNetInterfaceImpl*>(param);
 	int ret = pThis->GetLiveStatus();
-	pThis->liveStatusCb_(ret);
+	pThis->pPushMessageOpt_->LiveStatusCB(ret);
 }
 
 int CClientNetInterfaceImpl::GetLiveStatus()
@@ -141,31 +139,33 @@ void CClientNetInterfaceImpl::StopHeartBeat()
 	pInterLayer_->ClosePersistConnection();
 }
 
-void CClientNetInterfaceImpl::RegisterServerPushFunc( ServerPushCallBack_Info sp_cb_info)
+void CClientNetInterfaceImpl::RegisterPushFunc(IPushMessageOpt* pPushMessageOpt)
 {
 	b_callback_register_ = true;
-	sp_cb_info_ = sp_cb_info;
+	pPushMessageOpt_ = pPushMessageOpt;
 }
 
-void CClientNetInterfaceImpl::ServerPushMessageOpt( const std::string& server_push_message)
+void CClientNetInterfaceImpl::PushMessageOpt( const std::string& push_message)
 {
 
-	LOG4CXX_TRACE(g_logger, "CUserInterfaceImpl::ServerPushMessageOpt : " << server_push_message);
+	LOG4CXX_TRACE(g_logger, "CUserInterfaceImpl::PushMessageOpt : " << push_message);
 
 	if(!b_callback_register_)
-				return;
+			return;
 
-	SERVER_PUSH_INFO serverPushInfo;
-	serverPushInfo.message = server_push_message;
+	assert(pPushMessageOpt_ != NULL);
 
-	if (server_push_message.compare(std::string(STR_PTCP_HAS_ERROR)) == 0)
+	PUSH_INFO pushInfo;
+	pushInfo.message = push_message;
+
+	if (push_message.compare(std::string(STR_PTCP_HAS_ERROR)) == 0)
 	{
-		sp_cb_info_(PTCP_ERROR, serverPushInfo);
+		pPushMessageOpt_->LocalPushMessageOpt(PTCP_ERROR, pushInfo);
 	}
 
-	if (server_push_message.compare(std::string(STR_PTCP_HAS_CLOSED)) == 0)
+	if (push_message.compare(std::string(STR_PTCP_HAS_CLOSED)) == 0)
 	{
-		sp_cb_info_(PTCP_CLOSED, serverPushInfo);
+		pPushMessageOpt_->LocalPushMessageOpt(PTCP_CLOSED, pushInfo);
 	}
 
 	//TODO:推送消息回调
