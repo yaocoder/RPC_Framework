@@ -1,0 +1,20 @@
+依赖第三方库
+>libevent 2.0.21
+项目网站：	http://libevent.org/
+下载连接：	https://github.com/downloads/libevent/libevent/libevent-2.0.21-stable.tar.gz    
+
+>boost 1.49.0
+项目网站：	http://www.boost.org/users/history/version_1_49_0.html
+下载连接：  	http://sourceforge.net/projects/boost/files/boost/1.49.0/boost_1_49_0.tar.gz/download
+
+>libjson 7.6.1
+项目网站：	http://sourceforge.net/projects/libjson/
+下载连接：  	http://sourceforge.net/projects/libjson/files/latest/download
+
+>log4cxx 
+项目网站：	https://logging.apache.org/log4cxx/
+介绍网站： 	http://yaocoder.blog.51cto.com/2668309/980276    
+
+>gtest
+项目网站：	https://code.google.com/p/googletest/
+下载连接		https://code.google.com/p/googletest/downloads/detail?name=gtest-1.7.0.zip&can=2&q=
