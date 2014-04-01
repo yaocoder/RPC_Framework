@@ -128,5 +128,13 @@ bool CNetDataLayer::JsonParseGetResponseByRequest(const std::string& in_json_str
 	return true;
 }
 
+std::string CNetDataLayer::JsonJoinSendAsynRequest(const int asyn_request_id, const std::string& request)
+{
+	JSONNode out;
+	out.push_back(JSONNode(JK_ASYN_REQUEST_ID, asyn_request_id));
+	out.push_back(JSONNode(JK_ASYN_REQUEST, request));
+	return out.write();
+}
+
 
 

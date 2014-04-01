@@ -88,7 +88,7 @@ int CClientNetInterfaceImpl::EstablishPersistentChannel()
 
 int CClientNetInterfaceImpl::HeartBeatDetect()
 {
-	long time_interval = 10;
+	long time_interval = 30;
 	implTimer_ = new CImplTimer;
 	implTimer_->HeartBeatImpl(OnTimeGetLiveStatus, (void*)this, time_interval);
 
@@ -168,7 +168,7 @@ void CClientNetInterfaceImpl::PushMessageOpt( const std::string& push_message)
 		pPushMessageOpt_->LocalPushMessageOpt(PTCP_CLOSED, pushInfo);
 	}
 
-	//TODO:推送消息回调
+	//TODO:推送消息回调,包括异步请求的回复消息
 
 }
 
@@ -236,6 +236,12 @@ int CClientNetInterfaceImpl::GetResponseByRequestShortConnection(const std::stri
 	return ret;
 }
 
+int CClientNetInterfaceImpl::SendAsynRequest(const int asyn_request_id, const std::string& request)
+{
+	std::string new_request = pNetDataOpt_->JsonJoinSendAsynRequest(asyn_request_id, request);
+
+	return pInterLayer_->SendAysnRequestByPersistConnection(new_request);
+}
 
 
 

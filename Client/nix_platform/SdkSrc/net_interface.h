@@ -82,20 +82,26 @@ public:
 	virtual int EstablishPersistentChannel() = 0;
 
 	/**
-	 * @brief 远程过程调用接口实现(长连接）
+	 * @brief 远程过程调用接口实现(长连接，阻塞接口）
 	 * @param [in]	发送请求（请求只要与服务端协议对应即可）
 	 * @param [out] 回应
 	 */
 	virtual int GetResponseByRequestPersistentConnection(const std::string& request, std::string& response) = 0;
 
 	/**
-	 * @brief 远程过程调用接口实现(短连接）
+	 * @brief 远程过程调用接口实现(短连接，阻塞接口）
 	 * @param [in]	发送请求（请求只要与服务端协议对应即可）
 	 * @param [out] 回应
 	 */
 	virtual int GetResponseByRequestShortConnection(const std::string& request, std::string& response) = 0;
 
 
+	/**
+	 * @brief 发送异步请求(发送后立马返回，非阻塞接口，在IPushMessageOpt:AsynServerResponseOpt中根据异步过程标识处理回应）
+	 * @param [in]	异步过程标识(必须保证唯一）
+	 * @param [in]  请求
+	 */
+	virtual int SendAsynRequest(const int asyn_request_id, const std::string& request) = 0;
 
 private:
 

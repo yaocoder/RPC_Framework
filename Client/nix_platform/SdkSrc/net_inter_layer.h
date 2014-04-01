@@ -26,7 +26,9 @@ public:
 
 	int	 GetMessageId();
 
-	int	 GetResponseByRequest(const int message_id, const int tcp_connect_flag, const std::string& resquest, std::string& response);
+	int	 GetResponseByRequest(const int message_id, const int tcp_connect_flag, const std::string& request, std::string& response);
+
+	int  SendAysnRequestByPersistConnection(const std::string& request);
 
 	int  ClosePersistConnection();
 

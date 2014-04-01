@@ -15,7 +15,7 @@ class TimerImplByAsio
 {
 
 public:
-	TimerImplByAsio(Func f, void* param, long seconds) :param_(param),heartBeatSeconds_(seconds), func_(f), timer_(io_, boost::posix_time::seconds(10))
+	TimerImplByAsio(Func f, void* param, long seconds) :param_(param),heartBeatSeconds_(seconds), func_(f), timer_(io_, boost::posix_time::seconds(30))
 	{
 		try
 		{

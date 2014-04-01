@@ -178,7 +178,7 @@ void CNetInterLayer::maketimeout(struct timespec *tsp, long milliseconds)
 	tsp->tv_sec += (milliseconds/1000);
 	tsp->tv_nsec += (milliseconds%1000) * 1000000;
 }
-int CNetInterLayer::GetResponseByRequest(const int message_id, const int tcp_connect_flag, const std::string& resquest, std::string& response )
+int CNetInterLayer::GetResponseByRequest(const int message_id, const int tcp_connect_flag, const std::string& request, std::string& response )
 {
 	/** 阻塞在服务端回复处，创建一个请求id以便对应匹配的回复数据 */
 	int ret = SUCCESS;
@@ -199,7 +199,7 @@ int CNetInterLayer::GetResponseByRequest(const int message_id, const int tcp_con
 
 	if (SHORT_CONNECTION == tcp_connect_flag)
 	{
-		ret = pNetCore_->AddShortConnectionResquest(resquest);
+		ret = pNetCore_->AddShortConnectionResquest(request);
 		if (SUCCESS != ret)
 		{
 			LOG4CXX_ERROR(g_logger, "CNetInterLayer::GetResponseByRequest:AddShortConnectionResquest failed. message_id = " << message_id);
@@ -210,7 +210,7 @@ int CNetInterLayer::GetResponseByRequest(const int message_id, const int tcp_con
 
 	if (PERSIST_CONNECTION == tcp_connect_flag)
 	{
-		ret = pNetCore_->AddPersistConnectionRequest(resquest);
+		ret = pNetCore_->AddPersistConnectionRequest(request);
 		if (SUCCESS != ret)
 		{
 			LOG4CXX_ERROR(g_logger, "CNetInterLayer::GetResponseByRequest:AddPersistConnectionRequest failed. message_id = " << message_id);
@@ -244,6 +244,11 @@ int CNetInterLayer::GetResponseByRequest(const int message_id, const int tcp_con
 	sem_destroy(&cond);
 	ClearMapByMessageId(message_id);
 	return ret;
+}
+
+int CNetInterLayer::SendAysnRequestByPersistConnection(const std::string& request)
+{
+	return pNetCore_->AddPersistConnectionRequest(request);
 }
 
 int CNetInterLayer::ClosePersistConnection()

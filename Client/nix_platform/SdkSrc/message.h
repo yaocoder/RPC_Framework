@@ -44,6 +44,9 @@
 
 #define JK_CUSTOM_STRING		"cs"
 
+#define JK_ASYN_REQUEST_ID		"ari"
+#define JK_ASYN_REQUEST			"ar"
+
 enum P2RelayMessageType
 {
 	NOTIFY_OFFLINE = 4000,

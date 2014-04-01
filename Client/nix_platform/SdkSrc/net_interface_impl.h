@@ -33,6 +33,8 @@ public:
 
 	int GetResponseByRequestShortConnection(const std::string& request, std::string& response);
 
+	int SendAsynRequest(const int asyn_request_id, const std::string& request);
+
 private:
 
 	/**

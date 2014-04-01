@@ -20,6 +20,8 @@ public:
 	std::string JsonJoinGetResponseByRequest(const int message_id, const std::string& custom_string);
 	bool JsonParseGetResponseByRequest(const std::string& in_json_string, int& result, std::string& custom_string);
 
+	std::string JsonJoinSendAsynRequest(const int asyn_request_id, const std::string& request);
+
 private:
 
 	bool VerifyCommonJson(JSONNode& in);
