@@ -7,15 +7,37 @@
 #include "../SdkSrc/defines.h"
 #include <boost/filesystem.hpp>
 
-INetChannelInterface *pINetChannelInterface = CClientNetInterfaceImpl::GetImplInstance();
-
 LoggerPtr g_logger_in;
 
-void ServerPushInfo(const int message_type, const SERVER_PUSH_INFO& serverPushInfo)
+class MyPushMessageOpt : public IPushMessageOpt
 {
-	LOG4CXX_TRACE(g_logger, "+++++ServerPushInfo messagetype = " << message_type
-							<< ", message = " << serverPushInfo.message << "+++++");
-}
+public:
+
+	void LocalPushMessageOpt(const int message_type, const PUSH_INFO& pushInfo)
+	{
+		LOG4CXX_TRACE(g_logger_in, "+++++LocalPushMessageOpt messagetype = " << message_type
+								<< ", message = " << pushInfo.message << "+++++");
+	}
+
+	void LiveStatusCB(const int ret)
+	{
+		LOG4CXX_TRACE(g_logger_in, "******LiveStatus ret = " << ret << "******");
+	}
+
+	void AsynServerResponseOpt(const int asyn_id, const PUSH_INFO& serverPushInfo)
+	{
+
+	}
+
+	void ServerPushMessageOpt(const int message_type, const PUSH_INFO& pushInfo)
+	{
+
+	}
+};
+
+INetChannelInterface *pINetChannelInterface = CClientNetInterfaceImpl::GetImplInstance();
+
+
 
 void InitLogger(const std::string& file_path, const std::string& project_name)
 {
@@ -36,18 +58,19 @@ TEST(UserClientSDK, reentrant_InitSDK)
 	InitLogger(file_path, project_name);
 
 	ASSERT_TRUE(pINetChannelInterface->Init(ip, port, g_logger_in));
+
+	IPushMessageOpt *pPushMessageOpt = new MyPushMessageOpt;
+	pINetChannelInterface->RegisterPushFunc(pPushMessageOpt);
 }
 
-void LiveStatus(const int ret)
-{
-	LOG4CXX_TRACE(g_logger_in, "******LiveStatus ret = " << ret << "******");
-}
+
 
 
 TEST(UserClientSDK, reentrant_EstablishPersistentChannel)
 {
-	ASSERT_EQ(pINetChannelInterface->EstablishPersistentChannel(LiveStatus), SUCCESS);
+	ASSERT_EQ(pINetChannelInterface->EstablishPersistentChannel(), SUCCESS);
 }
+
 
 
 
