@@ -221,26 +221,31 @@ int CNetInterLayer::GetResponseByRequest(const int message_id, const int tcp_con
 
 	struct timespec timestruct = {0, 0};
 	maketimeout(&timestruct, request_reponse_timeout_);
-	int dw = sem_timedwait(&cond, &timestruct);
-	switch(dw)
+	int result = sem_timedwait(&cond, &timestruct);
+	if(0 == result)
 	{
-	case 0:
 		/** 回应 */
 		response = FindResponseByMessageId(message_id);
 		if (response.empty())
 		{
 			LOG4CXX_WARN(g_logger,"CNetInterLayer::GetResponseByRequest:FindResponseByMessageId empty. message_id = " << message_id);
 		}
-		break;
-	case ETIMEDOUT:
-		LOG4CXX_WARN(g_logger, "CNetInterLayer::GetResponseByRequest TIMEOUT."<< ", message_id = " << message_id);
-		ret  = REQ_RES_TIMEOUT;
-		break;
-	default:
-		LOG4CXX_ERROR(g_logger, "CNetInterLayer::GetResponseByRequest error. errorcode = " << strerror(errno) << ", message_id = " << message_id);
-		ret  = errno;
-		break;
 	}
+	else if(-1 == result)
+	{
+		ret = errno;
+		if(ret == ETIMEDOUT)
+		{
+			LOG4CXX_WARN(g_logger, "CNetInterLayer::GetResponseByRequest TIMEOUT. message_id = " << message_id);
+			ret  = REQ_RES_TIMEOUT;
+		}
+		else
+		{
+			LOG4CXX_ERROR(g_logger, "CNetInterLayer::GetResponseByRequest error. erorrcode = " << ret <<
+										"error = " << strerror(ret) << ", message_id = " << message_id);
+		}
+	}
+
 	sem_destroy(&cond);
 	ClearMapByMessageId(message_id);
 	return ret;
