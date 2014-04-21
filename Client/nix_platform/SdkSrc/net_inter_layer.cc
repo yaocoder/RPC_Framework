@@ -4,6 +4,9 @@
 #include "net_data_layer.h"
 #include "net_core_layer.h"
 #include "utils.h"
+#ifdef APPLE_PLATFORM
+#include "ios_sem.h"
+#endif
 
 CNetInterLayer::CNetInterLayer(void)
 {
@@ -182,7 +185,22 @@ int CNetInterLayer::GetResponseByRequest(const int message_id, const int tcp_con
 {
 	/** 阻塞在服务端回复处，创建一个请求id以便对应匹配的回复数据 */
 	int ret = SUCCESS;
+	NET_MSG net_msg;
+	net_msg.response = "";
 
+#ifdef APPLE_PLATFORM
+	sem_t *pCond;
+	std::string sem_name = utils::t2string(message_id);
+	pCond = CreateSemaphore(sem_name.c_str(), 0);
+	if(SEM_FAILED == pCond)
+	{
+		LOG4CXX_ERROR(g_logger, "CNetInterLayer::GetResponseByRequest:CreateSemaphore failed. error = "
+								<< strerror(errno));
+		LOG_E("CNetInterLayer::GetResponseByRequest:CreateSemaphore failed. error = %s .", strerror(errno));
+		return OTHER_ERROR;
+	}
+	net_msg.h_event = pCond;
+#else
 	sem_t cond;
 	ret = sem_init(&cond, 0, 0);
 	if(0 != ret)
@@ -190,10 +208,8 @@ int CNetInterLayer::GetResponseByRequest(const int message_id, const int tcp_con
 		LOG4CXX_ERROR(g_logger, "CNetInterLayer::GetResponseByRequest:CreateEvent failed. errorcode = " << ret);
 		return ret;
 	}
-
-	NET_MSG net_msg;
 	net_msg.h_event = &cond;
-	net_msg.response = "";
+#endif
 
 	map_message_.insert(message_id, net_msg);
 
@@ -219,9 +235,14 @@ int CNetInterLayer::GetResponseByRequest(const int message_id, const int tcp_con
 		}
 	}
 
+	int result = 0;
+#ifdef APPLE_PLATFORM
+	result = SemWaitIos(pCond, request_reponse_timeout_);
+#else
 	struct timespec timestruct = {0, 0};
 	maketimeout(&timestruct, request_reponse_timeout_);
-	int result = sem_timedwait(&cond, &timestruct);
+	result = sem_timedwait(&cond, &timestruct);
+#endif
 	if(0 == result)
 	{
 		/** 回应 */
@@ -246,7 +267,12 @@ int CNetInterLayer::GetResponseByRequest(const int message_id, const int tcp_con
 		}
 	}
 
+#ifdef APPLE_PLATFORM
+	DestroySemaphore(pCond);
+	ClearSemaphore(sem_name.c_str());
+#else
 	sem_destroy(&cond);
+#endif
 	ClearMapByMessageId(message_id);
 	return ret;
 }
