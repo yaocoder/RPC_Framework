@@ -43,6 +43,14 @@ bool CNetInterLayer::Init(CClientNetInterfaceImpl* pUserInterfaceImpl, const std
 	request_reponse_timeout_ = 10000;
 	LOG4CXX_TRACE(g_logger, " CNetInterLayer::Init:request_reponse_timeout.s = " << request_reponse_timeout_/1000);
 
+	int ret = pipe(notify_initsdkDone_fd_);
+	if (0 != ret) {
+		LOG4CXX_ERROR(g_logger, "CNetInterLayer::Init:pipe errorCode = " << ret);
+		LOGE("CNetInterLayer::Init:pipe errorCode = %d .", ret);
+		LOG_E("CNetInterLayer::Init:pipe errorCode = %d .", ret);
+		return false;
+	}
+
 	/** 开启libevent处理线程 */
 	pthread_t threadId;
 	int hThrd = pthread_create(&threadId, NULL, ThreadFunc, this);
@@ -59,7 +67,37 @@ bool CNetInterLayer::Init(CClientNetInterfaceImpl* pUserInterfaceImpl, const std
 		return false;
 	}
 
-	LOG4CXX_INFO(g_logger, " CNetInterLayer::Init:Thread:netCore:Run() success.");
+	/* 等待线程也初始化完成 */
+	fd_set fdsr;
+	FD_ZERO(&fdsr);
+	FD_SET(notify_initsdkDone_fd_[0], &fdsr);
+
+	struct timeval tv;
+	tv.tv_sec = 10;
+	tv.tv_usec = 0;
+
+	ret = select(notify_initsdkDone_fd_[0] + 1, &fdsr, NULL, NULL, &tv);
+	if (ret < 0)
+	{
+		LOG4CXX_ERROR(g_logger, " CNetInterLayer::Init error. errorCode = " << errno);
+		LOGE("CNetInterLayer::Init error. errorCode = %d.", errno);
+		LOG_E("CNetInterLayer::Init error. errorCode = %d.", errno);
+		return false;
+	}
+	else if (ret == 0)
+	{
+		LOG4CXX_WARN(g_logger, " CNetInterLayer::Init timeout.");
+		LOGW("CNetInterLayer::Init timeout.");
+		LOG_W("CNetInterLayer::Init timeout. %s ", "");
+		return false;
+	}
+	else
+	{
+		LOG4CXX_INFO(g_logger, " CNetInterLayer::Init:Thread:netCore:Run() success.");
+		LOGI("CNetInterLayer::Init:Thread:netCore:Run() success.");
+		LOG_I("CNetInterLayer::Init:Thread:netCore:Run() success. %s", "");
+		return true;
+	}
 
 	return true;
 }
@@ -70,7 +108,6 @@ void* CNetInterLayer::ThreadFunc(void* param)
 	pThis->pNetCore_->Run();
 	return NULL;
 }
-
 
 int CNetInterLayer::GetMessageId()
 {

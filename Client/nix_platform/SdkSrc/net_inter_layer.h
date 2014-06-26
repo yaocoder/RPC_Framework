@@ -32,6 +32,10 @@ public:
 
 	int  ClosePersistConnection();
 
+public:
+
+	int notify_initsdkDone_fd_[2];
+
 private:
 
 	static void* ThreadFunc(void* param);

@@ -71,7 +71,17 @@ void CNetCoreLayer::Run()
 	assert(local_read_event_ != NULL);
 	event_add(local_read_event_, NULL);
 
+	int size = write(pNetInterLayer_->notify_initsdkDone_fd_[1], "n", 1);
+	if (size < 0)
+	{
+		LOG4CXX_WARN(g_logger, " CNetCoreLayer::Run:write error. errorCode = " << errno);
+		LOGW("CNetCoreLayer::Run:write error. errorCode = %d", errno);
+		LOG_W("CNetCoreLayer::Run:write error. errorCode = %d", errno);
+	}
+
 	LOG4CXX_INFO(g_logger, "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^CNetCoreLayer::Run....^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
+	LOGI("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^CNetCoreLayer::Run....^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
+	LOG_I("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^CNetCoreLayer::Run....^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ %s", "");
 
 	int i = event_base_dispatch(base_);
 
