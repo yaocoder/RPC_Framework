@@ -1,4 +1,4 @@
-CXXFLAGS 	=	-O0 -g -Wall -fmessage-length=0 -DNDEBUG  -fPIC -DUSE_LOG4CXX -DUSE_LOG4CXX_PTR
+CXXFLAGS 	=	-O0 -g -Wall -fmessage-length=0 -DNDEBUG  -fPIC -DUSE_LOG4CXX -DUSE_LOG4CXX_PTR -DLINUX_PLATFORM 
 
 MIDOBJS 	= 	SdkSrc/net_interface.o SdkSrc/net_interface_impl.o  \
 		  		SdkSrc/net_data_layer.o SdkSrc/net_inter_layer.o SdkSrc/net_core_layer.o \

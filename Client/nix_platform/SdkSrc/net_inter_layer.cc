@@ -37,6 +37,8 @@ bool CNetInterLayer::Init(CClientNetInterfaceImpl* pUserInterfaceImpl, const std
 		return false;
 	}
 	LOG4CXX_INFO(g_logger, " CNetInterLayer::Init:InitNetCore success.");
+	LOGI("CNetInterLayer::Init:InitNetCore success.");
+	LOG_I("CNetInterLayer::Init:InitNetCore success. %s", "");
 
 	request_reponse_timeout_ = 10000;
 	LOG4CXX_TRACE(g_logger, " CNetInterLayer::Init:request_reponse_timeout.s = " << request_reponse_timeout_/1000);
