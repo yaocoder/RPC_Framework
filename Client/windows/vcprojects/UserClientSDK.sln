@@ -1,0 +1,26 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UserNetSdk", "user_client_sdk\UserInterface.vcproj", "{5B57D04C-F886-448F-A213-02C89A3243B4}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UserNetSdkUnitTest", "UnitTest\UnitTest.vcproj", "{691942F1-2FDE-4578-B873-8F6976B854A6}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{5B57D04C-F886-448F-A213-02C89A3243B4}.Debug|Win32.ActiveCfg = Debug|Win32
+		{5B57D04C-F886-448F-A213-02C89A3243B4}.Debug|Win32.Build.0 = Debug|Win32
+		{5B57D04C-F886-448F-A213-02C89A3243B4}.Release|Win32.ActiveCfg = Release|Win32
+		{5B57D04C-F886-448F-A213-02C89A3243B4}.Release|Win32.Build.0 = Release|Win32
+		{691942F1-2FDE-4578-B873-8F6976B854A6}.Debug|Win32.ActiveCfg = Debug|Win32
+		{691942F1-2FDE-4578-B873-8F6976B854A6}.Debug|Win32.Build.0 = Debug|Win32
+		{691942F1-2FDE-4578-B873-8F6976B854A6}.Release|Win32.ActiveCfg = Release|Win32
+		{691942F1-2FDE-4578-B873-8F6976B854A6}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
