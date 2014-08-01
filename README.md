@@ -11,3 +11,9 @@ RPC_Framework
 3. 客户端提供跨平台的支持，目前已经经过windows，linux，android，ios的测试；
 
 4. 服务端采用master-worker（one loop per thread）的高性能模型，可以有效地利用服务器的多核来负载连接处理；
+
+
+#####才测试说明
+****
+
+直接利用工程自带单元测试可以使用[HPNetServer](https://github.com/yaocoder/HPNetServer)服务端，因为彼此都使用json协议。如果想支持其他数据传输协议，只需替换数据层即可。
