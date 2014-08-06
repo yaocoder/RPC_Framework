@@ -3,16 +3,6 @@
 
 #include "user_interface_defines.h"
 
-#ifndef UNIT_TEST
-
-#ifdef _DLL_MODE
-#define DLL_MODE_API __declspec(dllexport)
-#else
-#define DLL_MODE_API __declspec(dllimport)
-#endif
-
-#endif
-
 
 /*注册的推送接口，使用者可以自己实现内部逻辑 */
 class IPushMessageOpt
@@ -50,6 +40,17 @@ public:
 
 
 #ifndef UNIT_TEST
+
+#ifdef _DLL_MODE
+#define DLL_MODE_API __declspec(dllexport)
+#else
+#define DLL_MODE_API __declspec(dllimport)
+#endif
+
+#endif
+
+
+#ifndef UNIT_TEST
 class  DLL_MODE_API IUserInterface
 #else
 class  IUserInterface
@@ -63,7 +64,8 @@ public:
 	static void DestroyImplInstance(const IUserInterface* pImpl);
 
 	/**
-	 * @brief 初始化SDK（在此接口设计中，相关配置参数全部通过配置文件加载）
+	 * @brief 初始化SDK（在此工程中，相关配置参数全部通过配置文件加载<服务器ip、port，心跳间隔，超时时间...>,
+	                    需要者可以根据自己需要进行接口改写）
 	 */
 	virtual bool InitSDK() = 0;
 
