@@ -271,10 +271,6 @@
 			>
 		</File>
 		<File
-			RelativePath=".\resource_temp.h"
-			>
-		</File>
-		<File
 			RelativePath=".\UserInterface.rc"
 			>
 		</File>

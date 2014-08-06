@@ -15,12 +15,20 @@ public:
 
 	~CUserInterfaceImpl();
 
-	/** ================= Í¨ÓÃ²Ù×÷ =============**/
-
 	bool InitSDK();
 
 	void UninitSDK();
 
+	int EstablishPersistentChannel();
+
+	void RegisterPushFunc(IPushMessageOpt* pPushMessageOpt);
+	void PushMessageOpt(const std::string& push_message);
+
+	int GetResponseByRequestPersistentConnection(const std::string& request, std::string& response);
+
+	int GetResponseByRequestShortConnection(const std::string& request, std::string& response);
+
+	int SendAsynRequest(const int asyn_request_id, const std::string& request);
 
 private:
 
@@ -29,7 +37,6 @@ private:
 	CNetInterLayer* pInterLayer_;
 
 
-	ServerPushCallBack_Info sp_cb_info_;
 };
 
 

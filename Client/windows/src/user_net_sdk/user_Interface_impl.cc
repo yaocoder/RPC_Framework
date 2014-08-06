@@ -1,6 +1,4 @@
 #include "user_interface_impl.h"
-//#include <boost/asio.hpp>
-//#include <boost/date_time/posix_time/posix_time.hpp>
 #include "message.h"
 #include "net_data_layer.h"
 #include "net_inter_layer.h"
@@ -39,6 +37,36 @@ void CUserInterfaceImpl::UninitSDK()
 {
 	utils::SafeDelete(pInterLayer_);
 	utils::SafeDelete(pNetDataOpt_);
+}
+
+int CUserInterfaceImpl::EstablishPersistentChannel()
+{
+	return SUCCESS;
+}
+
+void CUserInterfaceImpl::RegisterPushFunc( IPushMessageOpt* pPushMessageOpt )
+{
+
+}
+
+void CUserInterfaceImpl::PushMessageOpt( const std::string& push_message )
+{
+
+}
+
+int CUserInterfaceImpl::GetResponseByRequestPersistentConnection( const std::string& request, std::string& response )
+{
+	return SUCCESS;
+}
+
+int CUserInterfaceImpl::GetResponseByRequestShortConnection( const std::string& request, std::string& response )
+{
+	return SUCCESS;
+}
+
+int CUserInterfaceImpl::SendAsynRequest( const int asyn_request_id, const std::string& request )
+{
+	return SUCCESS;
 }
 
 

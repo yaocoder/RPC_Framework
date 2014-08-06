@@ -29,8 +29,6 @@ bool CNetInterLayer::Init(CUserInterfaceImpl* pUserInterfaceImpl)
 	std::string log_conf_fullpath, conf_fullpath;
 
 	/** 初始化配置文件 */
-#ifdef NEED_CONF_PATH
-	
 	std::string current_path = path_utils::GetModuleDirectory(utils::GetCurrentModule());
 
 	log_conf_fullpath = current_path + std::string(LOG_CON_FILE);
@@ -44,16 +42,6 @@ bool CNetInterLayer::Init(CUserInterfaceImpl* pUserInterfaceImpl)
 	}
 
 	LOG4CXX_TRACE(g_logger, "current_path = " << current_path);
-#else
-	pInitConfig_->InitLog4cxx("user_interface", false, log_conf_fullpath);
-
-	conf_fullpath = std::string(".") + std::string(CONF_FILE);
-	if(!pInitConfig_->LoadConfiguration(conf_fullpath))
-	{
-		LOG4CXX_ERROR(g_logger, "CNetInterLayer::Init:LoadConfiguration error. conf_fullpath = " << conf_fullpath);
-		return false;
-	}
-#endif
 
 	pUserInterfaceImpl_ = pUserInterfaceImpl;
 
@@ -108,23 +96,11 @@ void CNetInterLayer::ReciveData(const std::string& response, const int connectio
 	std::string recover_string = utils::ReplaceString(response, "\\\\r\\\\n", "\\r\\n");
 
 
-#ifdef PUSH_LOGIC
 	/** 判断是否为推送消息 */
 	if (PERSIST_CONNECTION == connection_type)
 	{
-		/** 检测长连接异常关闭*/
-		if (recover_string.compare(std::string(STR_PTCP_HAS_CLOSED)) == 0)
-		{
-			return;
-		}
-
-		/** 检测到长连接错误 */
-		if (recover_string.compare(std::string(STR_PTCP_HAS_ERROR)) == 0)
-		{
-			return;
-		}
+		//TODO
 	}
-#endif
 
 	/** 解析消息ID */
 	int message_id = 0;
@@ -237,11 +213,12 @@ int CNetInterLayer::GetResponseByRequest(const int message_id, const int tcp_con
 		break;
 	case WAIT_TIMEOUT:
 		LOG4CXX_WARN(g_logger, "CNetInterLayer::GetResponseByRequest TIMEOUT."<< ", message_id = " << message_id);
-		ret  = TIMEOUT;
+		ret  = REQ_RES_TIMEOUT;
 		break;
 	case WAIT_FAILED:
-		LOG4CXX_ERROR(g_logger, "CNetInterLayer::GetResponseByRequest error. errorcode = " << GetLastError() << ", message_id = " << message_id);
-		ret  = C_OTHER_ERROR;
+		int result = GetLastError();
+		LOG4CXX_ERROR(g_logger, "CNetInterLayer::GetResponseByRequest error. errorcode = " << result << ", message_id = " << message_id);
+		ret  = result;
 		break;
 	}
 

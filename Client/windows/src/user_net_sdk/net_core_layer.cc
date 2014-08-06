@@ -229,7 +229,7 @@ int CNetCoreLayer::AddShortConnectionResquest(const std::string& request )
 		else
 		{
 			::closesocket(short_sfd);
-			return C_OTHER_ERROR;
+			return CONN_OTHER_ERROR;
 		}
 	}
 
@@ -237,7 +237,7 @@ int CNetCoreLayer::AddShortConnectionResquest(const std::string& request )
 	{   
 		LOG4CXX_ERROR(g_logger, "CNetCoreLayer::AddShortConnectionResquest:setsockopt(TCP_NODELAY) short_sfd failed. errorCode = " <<WSAGetLastError());   
 		::closesocket(short_sfd);
-		return C_OTHER_ERROR;   
+		return CONN_OTHER_ERROR;   
 	} 
 
 	/** 通知 libevent线程，加入监控此socket */
@@ -252,7 +252,7 @@ int CNetCoreLayer::AddShortConnectionResquest(const std::string& request )
 	{
 		LOG4CXX_WARN(g_logger, "CNetCoreLayer::AddShortConnectionResquest:send error. errorCode = " << WSAGetLastError());
 		::closesocket(short_sfd);
-		return C_OTHER_ERROR;
+		return CONN_OTHER_ERROR;
 	}
 
 	return SUCCESS;
@@ -291,7 +291,7 @@ int CNetCoreLayer::AddPersistConnectionRequest(const std::string& request )
 			else
 			{
 				::closesocket(persist_sfd);
-				return C_OTHER_ERROR;
+				return CONN_OTHER_ERROR;
 			}
 		}
 
@@ -299,7 +299,7 @@ int CNetCoreLayer::AddPersistConnectionRequest(const std::string& request )
 		{   
 			LOG4CXX_ERROR(g_logger, "CNetCoreLayer::AddPersistConnectioRequest:setsockopt(TCP_NODELAY) persist_sfd failed. errorCode = " << WSAGetLastError());
 			::closesocket(persist_sfd);
-			return C_OTHER_ERROR;   
+			return CONN_OTHER_ERROR;   
 		}  
 
 		persist_connection_has_ = true;
@@ -316,7 +316,7 @@ int CNetCoreLayer::AddPersistConnectionRequest(const std::string& request )
 		{
 			LOG4CXX_ERROR(g_logger, "CNetCoreLayer::AddPersistConnectioRequest:send error. errorCode = " << WSAGetLastError());
 			::closesocket(persist_sfd);
-			return C_OTHER_ERROR;
+			return CONN_OTHER_ERROR;
 		}
 
 
@@ -334,7 +334,7 @@ int CNetCoreLayer::AddPersistConnectionRequest(const std::string& request )
 	if (send_size < 0)
 	{
 		LOG4CXX_WARN(g_logger, "CNetCoreLayer::AddPersistConnectioRequest:send failed. errorcode = " << WSAGetLastError());
-		return C_OTHER_ERROR;
+		return CONN_OTHER_ERROR;
 	}
 
 	return SUCCESS;
