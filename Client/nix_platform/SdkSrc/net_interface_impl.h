@@ -49,7 +49,6 @@ private:
 	*/
 	int GetLiveStatus();
 	void StopHeartBeat();
-	int ClearSession();
 	static void OnTimeGetLiveStatus(void* param);
 
 private:

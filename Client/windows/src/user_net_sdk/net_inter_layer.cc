@@ -228,6 +228,11 @@ int CNetInterLayer::GetResponseByRequest(const int message_id, const int tcp_con
 	return ret;
 }
 
+int CNetInterLayer::SendAysnRequestByPersistConnection(const std::string& request)
+{
+	return pNetCore_->AddPersistConnectionRequest(request);
+}
+
 int CNetInterLayer::ClosePersistConnection()
 {
 	return pNetCore_->ClosePersistConnection();

@@ -69,9 +69,6 @@ public:
 	 */
 	virtual bool InitSDK() = 0;
 
-	virtual void UninitSDK() = 0;
-
-
 	/**
 	 * @brief 注册推送逻辑（在Init成功后必须调用）
 	 * @param [in] 见类IPushMessageOpt

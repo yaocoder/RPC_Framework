@@ -1,8 +1,8 @@
 #include "net_core_layer.h"
 #include <assert.h>
 #include <sys/types.h>
-#include "net_inter_layer.h"
 #include "message.h"
+#include "net_inter_layer.h"
 #include "../common/config_file.h"
 #include "../common/defines.h"
 #include "../common/utils.h"
