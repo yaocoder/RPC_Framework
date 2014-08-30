@@ -64,6 +64,28 @@ bool CNetInterLayer::Init(CUserInterfaceImpl* pUserInterfaceImpl)
 	}
 	::CloseHandle(hThrd);
 
+	/*  增加initSDK的线程初始化完成通知，保证initsdk接口返回后所有资源已执行完毕 */
+	initSdk_done_event_ = ::CreateEvent(NULL,TRUE,FALSE,NULL);
+	if (NULL == initSdk_done_event_)
+	{
+		LOG4CXX_ERROR(g_logger, " CNetInterLayer::Init:CreateEvent failed. errorcode = " << GetLastError());
+		return false;
+	}
+
+	int timeout = utils::G<ConfigFile>().read<int>("request.timeout.ms", 10000);
+	DWORD dw = ::WaitForSingleObject(initSdk_done_event_, timeout);
+	switch(dw)
+	{
+	case WAIT_OBJECT_0:
+		break;
+	case WAIT_TIMEOUT:
+		LOG4CXX_WARN(g_logger, "CNetInterLayer::Init TIMEOUT.");
+		return false;
+	case WAIT_FAILED:
+		LOG4CXX_ERROR(g_logger, "CNetInterLayer::Init failed. errorcode = " << GetLastError());
+		return false;
+	}
+
 	LOG4CXX_INFO(g_logger, " CNetInterLayer::Init:Thread:netCore:Run() success.");
 
 	return true;

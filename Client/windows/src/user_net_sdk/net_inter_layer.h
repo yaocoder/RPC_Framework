@@ -32,10 +32,13 @@ public:
 
 	int  ClosePersistConnection();
 
+public:
+
+	HANDLE	initSdk_done_event_;
+
 private:
 
 	boost::mutex mutex_;
-
 
 	static DWORD WINAPI ThreadFunc(LPVOID param);
 

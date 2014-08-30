@@ -74,6 +74,7 @@ bool CNetCoreLayer::InitNetCore(CNetInterLayer* pNetInterLayer)
 	std::string basicinfo_server_domain = utils::G<ConfigFile>().read<std::string>("basicinfo.server.ip", "cloudsee.jovemail.com");
 	std::string business_server_domain	= utils::G<ConfigFile>().read<std::string>("business.server.ip", "cloudsee.jovemail.com");
 
+	/* 风险： 域名解析调用为阻塞调用，最好把配置ip暴漏在业务层 */
 	if (!GetIpByDomain(basicinfo_server_domain, basicinfo_server_ip_))
 	{
 		return false;
@@ -95,6 +96,12 @@ void CNetCoreLayer::Run()
 	local_read_event_ = event_new(base_, pipe_[1], EV_READ|EV_PERSIST, DoLocalRead, (void*)this);
 	assert(local_read_event_ != NULL);
 	event_add(local_read_event_, NULL);
+
+	/* 通知上层初始化完成*/
+	if (!::SetEvent(pNetInterLayer_->initSdk_done_event_))
+	{
+		LOG4CXX_ERROR(g_logger, "CNetCoreLayer::Run:SetEvent failed. errorCode = " << GetLastError());	
+	}
 
 	LOG4CXX_INFO(g_logger, "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^CNetCoreLayer::Run....^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
 
