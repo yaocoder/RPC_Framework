@@ -48,7 +48,7 @@ private:
 	static void* ThreadPushFunc(void* param);
 	void CallServerPushMessageOpt();
 	bool b_push_thread_run_;
-	boost::mutex mutex_push_;
+	boost::recursive_mutex mutex_push_;
 	boost::condition_variable_any cond_push_;
 	CThreadSafeList<std::string> list_push_message_;
 

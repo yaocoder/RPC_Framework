@@ -129,7 +129,7 @@ void* CNetInterLayer::ThreadPushFunc(void* param)
 
 void  CNetInterLayer::CallServerPushMessageOpt()
 {
-	boost::mutex::scoped_lock oLock(mutex_push_);
+	boost::recursive_mutex::scoped_lock oLock(mutex_push_);
 	std::string push_message;
 	while(b_push_thread_run_)
 	{
