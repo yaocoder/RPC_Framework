@@ -19,4 +19,4 @@ RPC_Framework
 直接利用工程自带单元测试可以使用[HPNetServer](https://github.com/yaocoder/HPNetServer)服务端，因为彼此都使用json协议。如果想支持其他数据传输协议，只需替换数据层即可。
 
 #####知识扩展
-* [客户端网络库实现真的很简单吗？](http://yaocoder.blog.51cto.com/2668309/1541271)
+* [《客户端网络库实现真的很简单吗？》](http://yaocoder.blog.51cto.com/2668309/1541271)
